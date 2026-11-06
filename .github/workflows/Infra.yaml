@@ -40,4 +40,4 @@ jobs:
           with:
             name: tfplan
             path: tfplan
-            retention-days: 1  
+            retention-days: 7
