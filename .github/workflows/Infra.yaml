@@ -5,40 +5,47 @@ on:
     branches:
       - main
     paths:
-      - 'Infra/**'
-      - '.github/workflows/**'
+      - "Infra/**"
+      - ".github/workflows/**"
 
-env:
-  TF_VERSION: '1.6.0'
-  TERRAFORM_WORKING_DIR: './Infra'
+      permissions:
+        contents: read
+        pull-requests: write
+        id-token: write
+
+      env:
+        ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+        ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+        ARM_USE_OIDC: true
 
 defaults:
   run:
     working-directory: ./Infra
-    
+
 permissions:
   contents: read
-  pull-requests: write  
+  pull-requests: write
 
 jobs:
-    terraform_build:
-      runs-on: ubuntu-latest
-      steps:
-        - name: checkout
-          uses: actions/checkout@v3
-        - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v2
-          with:
-            terraform_version: ${{ env.TF_VERSION }}    
-        - name: Terraform Init  
-          run: terraform init
-        - name: Terraform Validate
-          run: terraform validate       
-        - name: Terraform Plan
-          run: terraform plan -out=tfplan
-        - name: upload Plan Artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: tfplan
-            path: tfplan
-            retention-days: 7
+  terraform_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      - name: Terraform Init
+        run: terraform init
+      - name: Terraform Validate
+        run: terraform validate
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+      - name: upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: tfplan
+          retention-days: 7
