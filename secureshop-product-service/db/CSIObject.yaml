@@ -1,0 +1,24 @@
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: securedatabase
+  namespace: database
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "false"
+    useVMManagedIdentity: "false"
+    clientID: "d53d91ab-c57d-4f35-94ed-475509e1303b"
+    keyvaultName: "secureshop-dev-kv-9898"
+    tenantId: "ffc44944-9df7-460d-95f5-4ebc37222999"
+    objects: |
+      array:
+        - |
+          objectName: POSTGRES-USER
+          objectType: secret
+        - |
+          objectName: POSTGRES-PASSWORD
+          objectType: secret
+        - |
+          objectName: POSTGRES-DB
+          objectType: secret

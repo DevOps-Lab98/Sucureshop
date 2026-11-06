@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: database
+  labels:                          # FIX 1 — "Labels" capital L invalid, YAML case-sensitive
+    app: postgres
+spec:
+  replicas: 1                      # FIX 2 — 2 se 1 kiya, postgres ko multiple
+                                    # replicas mein bina clustering setup ke chalana
+                                    # data corruption ka risk hai (ek hi disk pe
+                                    # do writers)
+
+  selector:
+    matchLabels:
+      app: postgres
+
+  template:
+    metadata:
+      labels:
+        app: postgres
+        azure.workload.identity/use: "true"
+
+    spec:
+      serviceAccountName: securedatabase   # FIX 3 — aapke actual apply output mein
+                                             # "serviceaccount/securedatabase created"
+                                             # tha, "secureatabase" nahi. Naam match
+                                             # nahi hota to pod authentication fail
+                                             # hota — yahi pichli baar ka bug tha.
+
+      containers:
+        - name: postgres
+          image: secureshopdevacr.azurecr.io/dpsecure:v1
+
+          ports:
+            - containerPort: 5432
+
+          env:
+            - name: POSTGRES_USER_FILE
+              value: /mnt/secrets-store/POSTGRES-USER
+
+            - name: POSTGRES_PASSWORD_FILE
+              value: /mnt/secrets-store/POSTGRES-PASSWORD
+
+            - name: POSTGRES_DB_FILE
+              value: /mnt/secrets-store/POSTGRES-DB
+
+          volumeMounts:
+            - name: secrets-store
+              mountPath: /mnt/secrets-store
+              readOnly: true
+
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+
+      volumes:
+        - name: init-script
+          configMap:
+            name: postgres-init
+
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: securedatabase   # FIX 4 — aapke apply output mein
+                                                      # "secretproviderclass.../securedatabase
+                                                      # created" tha, "postgres-secrets"
+                                                      # nahi. Ye naam bhi mismatch tha.

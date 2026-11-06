@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecureShop — Product Catalog</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">S</span>
+      <span class="brand-name">SecureShop <em>Product Catalog</em></span>
+    </div>
+    <div class="status" id="apiStatus">checking API…</div>
+  </header>
+
+  <main class="layout">
+    <section class="panel form-panel">
+      <h2 id="formTitle">Add product</h2>
+      <form id="productForm">
+        <input type="hidden" id="productId" />
+        <label>Name
+          <input type="text" id="name" required maxlength="255" placeholder="e.g. Wireless Mouse" />
+        </label>
+        <label>Description
+          <textarea id="description" rows="3" placeholder="Optional"></textarea>
+        </label>
+        <div class="row">
+          <label>Price (₹)
+            <input type="number" id="price" min="0" step="0.01" required />
+          </label>
+          <label>Stock
+            <input type="number" id="stock" min="0" step="1" value="0" />
+          </label>
+        </div>
+        <div class="actions">
+          <button type="submit" id="submitBtn">Add product</button>
+          <button type="button" id="cancelEdit" class="ghost" hidden>Cancel</button>
+        </div>
+        <p class="error" id="formError"></p>
+      </form>
+    </section>
+
+    <section class="panel list-panel">
+      <div class="list-head">
+        <h2>Products</h2>
+        <button id="refreshBtn" class="ghost small">Refresh</button>
+      </div>
+      <div id="productList" class="product-list">
+        <p class="empty">Loading products…</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

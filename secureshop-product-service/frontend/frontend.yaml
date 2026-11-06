@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: frontend-deployment
+  namespace: frontend
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: frontend-deployment
+
+  template:
+    metadata:
+      labels:
+        app: frontend-deployment
+
+    spec:
+      containers:
+        - name: frontend
+          image: secureshopdevacr.azurecr.io/frontend_2:latest 
+
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+
+          ports:
+            - containerPort: 80
