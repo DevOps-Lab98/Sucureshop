@@ -46,3 +46,25 @@ jobs:
           name: tfplan
           path: Infra/tfplan
           retention-days: 1
+  
+
+
+  terraform_deploy:
+    needs: terraform_build  
+    runs-on: ubuntu-latest
+    steps:    
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      - name: download Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: Infra
+      - name: Terraform Init
+        run: terraform init
+      - name: Terraform Apply
+        run: terraform apply tfplan
